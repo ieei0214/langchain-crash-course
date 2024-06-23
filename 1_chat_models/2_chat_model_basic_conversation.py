@@ -21,7 +21,7 @@ messages = [
 # Invoke the model with messages
 result = model.invoke(messages)
 # print(f"Answer from AI: {result.content}")
-print(f"Answer from AI: {result}")
+print(f"1. Answer from AI: {result}")
 
 # AIMessage:
 #   Message from an AI.
@@ -35,4 +35,4 @@ messages = [
 # Invoke the model with messages
 result = model.invoke(messages)
 # print(f"Answer from AI: {result.content}")
-print(f"Answer from AI: {result}")
+print(f"2. Answer from AI: {result}")
