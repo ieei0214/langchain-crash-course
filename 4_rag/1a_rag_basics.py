@@ -45,7 +45,8 @@ if not os.path.exists(persistent_directory):
     # Create the vector store and persist it automatically
     print("\n--- Creating vector store ---")
     db = Chroma.from_documents(
-        docs, embeddings, persist_directory=persistent_directory)
+        docs, embeddings, persist_directory=persistent_directory,
+        collection_metadata={"hnsw:space": "cosine"})
     print("\n--- Finished creating vector store ---")
 
 else:
