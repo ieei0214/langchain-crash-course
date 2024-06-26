@@ -9,7 +9,8 @@ from langchain.text_splitter import (
 )
 from langchain_community.document_loaders import TextLoader
 from langchain_community.vectorstores import Chroma
-from langchain_openai import OpenAIEmbeddings
+# from langchain_openai import OpenAIEmbeddings
+from langchain_community.embeddings.ollama import OllamaEmbeddings
 
 # Define the directory containing the text file
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -23,12 +24,13 @@ if not os.path.exists(file_path):
     )
 
 # Read the text content from the file
-loader = TextLoader(file_path)
+loader = TextLoader(file_path, encoding="utf-8")
 documents = loader.load()
 
 # Define the embedding model
-embeddings = OpenAIEmbeddings(
-    model="text-embedding-3-small"
+embeddings = OllamaEmbeddings(
+    # model="text-embedding-3-small"
+    model="nomic-embed-text"
 )  # Update to a valid embedding model if needed
 
 
@@ -38,7 +40,7 @@ def create_vector_store(docs, store_name):
     if not os.path.exists(persistent_directory):
         print(f"\n--- Creating vector store {store_name} ---")
         db = Chroma.from_documents(
-            docs, embeddings, persist_directory=persistent_directory
+            docs, embeddings, persist_directory=persistent_directory,collection_metadata={"hnsw:space": "cosine"}
         )
         print(f"--- Finished creating vector store {store_name} ---")
     else:
@@ -102,7 +104,8 @@ def query_vector_store(store_name, query):
     if os.path.exists(persistent_directory):
         print(f"\n--- Querying the Vector Store {store_name} ---")
         db = Chroma(
-            persist_directory=persistent_directory, embedding_function=embeddings
+            persist_directory=persistent_directory, embedding_function=embeddings,
+            collection_metadata={"hnsw:space": "cosine"}
         )
         retriever = db.as_retriever(
             search_type="similarity_score_threshold",
