@@ -3,10 +3,12 @@ import os
 from dotenv import load_dotenv
 from langchain_community.vectorstores import Chroma
 from langchain_core.messages import HumanMessage, SystemMessage
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+# from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain_community.embeddings.ollama import OllamaEmbeddings
+from langchain_community.llms import Ollama
 
 # Load environment variables from .env
-load_dotenv()
+# load_dotenv()
 
 # Define the persistent directory
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -14,11 +16,13 @@ persistent_directory = os.path.join(
     current_dir, "db", "chroma_db_with_metadata")
 
 # Define the embedding model
-embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+# embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+embeddings = OllamaEmbeddings(model="nomic-embed-text")
 
 # Load the existing vector store with the embedding function
 db = Chroma(persist_directory=persistent_directory,
-            embedding_function=embeddings)
+            embedding_function=embeddings,
+            collection_metadata={"hnsw:space": "cosine"})
 
 # Define the user's question
 query = "How can I learn more about LangChain?"
@@ -45,7 +49,8 @@ combined_input = (
 )
 
 # Create a ChatOpenAI model
-model = ChatOpenAI(model="gpt-4o")
+# model = ChatOpenAI(model="gpt-4o")
+model = Ollama(model="llama3:8b")
 
 # Define the messages for the model
 messages = [
@@ -61,4 +66,4 @@ print("\n--- Generated Response ---")
 # print("Full result:")
 # print(result)
 print("Content only:")
-print(result.content)
+print(result)

@@ -2,9 +2,10 @@ import os
 
 from dotenv import load_dotenv
 from langchain_community.vectorstores import Chroma
-from langchain_openai import OpenAIEmbeddings
+# from langchain_openai import OpenAIEmbeddings
+from langchain_community.embeddings.ollama import OllamaEmbeddings
 
-load_dotenv()
+# load_dotenv()
 
 # Define the persistent directory
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -12,11 +13,13 @@ db_dir = os.path.join(current_dir, "db")
 persistent_directory = os.path.join(db_dir, "chroma_db_with_metadata")
 
 # Define the embedding model
-embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+# embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+embeddings = OllamaEmbeddings(model="nomic-embed-text")
 
 # Load the existing vector store with the embedding function
 db = Chroma(persist_directory=persistent_directory,
-            embedding_function=embeddings)
+            embedding_function=embeddings,
+            collection_metadata={"hnsw:space": "cosine"})
 
 
 # Function to query a vector store with different search types and parameters
@@ -28,6 +31,7 @@ def query_vector_store(
         db = Chroma(
             persist_directory=persistent_directory,
             embedding_function=embedding_function,
+            collection_metadata={"hnsw:space": "cosine"}
         )
         retriever = db.as_retriever(
             search_type=search_type,
